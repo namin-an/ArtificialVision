@@ -31,14 +31,13 @@ We used K-face dataset, which can be downloaded from https://aihub.or.kr.
 │   ├── Wordclouds.ipynb (Figs 1c, S1c, 5d, and S5d)
 ```
 
-### Adaptations
+## Adaptations
 > Grad-CAM [*/pytorch_grad_cam*](https://github.com/jacobgil/pytorch-grad-cam)   
 > Early-stopping [*/mypackages/pytorchtools.py*](https://github.com/Bjarten/early-stopping-pytorch)
 <br />
 
 
-### Citation
------
+## Citation
 If you want to report the results of our method or implement the framework, please cite as follows:   
 ```
 @INPROCEEDINGS{?,
