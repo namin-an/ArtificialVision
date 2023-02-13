@@ -18,37 +18,38 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 <br />
 
 
+## Datasets
+> Machine data: [K-face dataset](https://aihub.or.kr)
+> Human data: [*/data/Human_Expert/211202/*]
+
+
 ## Code structure
 ```
-├── scripts
+├── main.py (Usage #3)
+├── loadData.py  
+├── trainANNs.py 
+├── testPhosphenes.py  
+├── mypackages
+│   ├── pytorchtools.py
+├── scripts (training options)
 │   ├── cnn_svc_4_elec.sh
 │   ├── cnn_svc_4_opt.sh
 │   ├── cnn_svc_16_elec.sh
 │   ├── cnn_svc_16_opt.sh
-├── process.py (Usage #2)
-├── train.py (Usage #3) 
-├── test.py (Usage #4) 
-├── loadData.py  
-├── mypackages
-│   ├── pytorchtools.py
-├── checkpoints (freezed parameters for shallow ML model) 
-├── Visualization (Optional usage #5)
-│   ├── ColormapsPIXGS.ipynb (Figs. 1a, S1a, 3a, and S3a)
+│
+├── Visualization (Optional usage #4)
+│   ├── ColormapsPIXGS.ipynb (Figs. 1a, S1a, 3a, S3a, Ext. Data Fig. 1a, and 1b)
 │   ├── Parallel.ipynb (Figs. 1e and S1e) 
 │   ├── Prediction.ipynb (Figs 1e, S1e, 3a-c, and S3a-c)  
 │   ├── Wordclouds.ipynb (Figs 1c, S1c, 5d, and S5d)
+├── checkpoints (freezed parameters for shallow ML model) 
 ```
 <br />
 
 
-## Dataset
-We used K-face data, which can be downloaded from https://aihub.or.kr.
-<br />
-
-
 ## Adaptations
-> Grad-CAM [*/pytorch_grad_cam*](https://github.com/jacobgil/pytorch-grad-cam)   
-> Early-stopping [*/mypackages/pytorchtools.py*](https://github.com/Bjarten/early-stopping-pytorch)
+> Grad-CAM [*/pytorch_grad_cam*](https://github.com/jacobgil/pytorch-grad-cam) (Figs. 5a and S5a)  
+> Early-stopping [*/mypackages/pytorchtools.py*](https://github.com/Bjarten/early-stopping-pytorch) (for training)   
 <br />
 
 
@@ -66,22 +67,20 @@ conda activate artificialvision
 pip install -r requirements.txt   
 ```
 
-3. Process high-resolution original to low-resolution phosphene images.
+3. Preprocess the downloaded K-face datasets by following the step-by-step process from the jupyter notebook below:
 ```
-python process.py
-```
-
-4. Train various machine learning (ML) models using high-resolution images.
-```
-python train.py
+selectTrainableImgs.ipynb # Select 4,972 images that are trainable (Fig. S7b)   
+processBeforeDownsamp.ipynb # Crop the images into squares, remove noisy backgrounds, and enhance the contrast of the images (Fig. S7c-d and the first three steps in Fig. S7e)   
+downsampling.ipynb # Make low-resolution phosphene images (the last three steps in Fig. S7e, S7f, and S7g)
 ```
 
-5. Test the performances of ML models on low-resolution images.
+3. Build and evaluate various machine learning (ML) models.
 ```
-python test.py
+python main.py -demo_type train # 1. To train various ML models using high-resolution images (DEFAULT: opt/CNN_SVC/16).   
+python main.py -demo_type test # 2. To test the performances of ML models on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
 ```
 
-6. (OPTIONAL) Reproduce several figures from the manuscript.
+4. (OPTIONAL) Reproduce several figures from the manuscript.   
 ```
 Visualization/
 ```
