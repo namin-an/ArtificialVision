@@ -69,9 +69,9 @@ pip install -r requirements.txt
 
 3. Preprocess the downloaded K-face datasets by following the step-by-step process from the jupyter notebook below:
 ```
-selectTrainableImgs.ipynb # Select 4,972 images that are trainable (Fig. S7b)   
-processBeforeDownsamp.ipynb # Crop the images into squares, remove noisy backgrounds, and enhance the contrast of the images (Fig. S7c-d and the first three steps in Fig. S7e)   
-downsampling.ipynb # Make low-resolution phosphene images (the last three steps in Fig. S7e, S7f, and S7g)
+selectTrainableImgs.ipynb # Select 4,972 images that are trainable (Fig. S7b).   
+processBeforeDownsamp.ipynb # Crop the images into squares, remove noisy backgrounds, and enhance the contrast of the images (Fig. S7c-d and the first three steps in Fig. S7e).   
+downsampling.ipynb # Make low-resolution phosphene images (the last three steps in Fig. S7e, S7f, and S7g).
 ```
 
 3. Build and evaluate various machine learning (ML) models.
