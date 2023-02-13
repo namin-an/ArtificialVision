@@ -2,6 +2,7 @@
 Visualization_deprecated/
 data/
 figures/
+checkpoints/Checkpoint_*_demo.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
