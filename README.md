@@ -25,9 +25,9 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 │   ├── cnn_svc_4_opt.sh
 │   ├── cnn_svc_16_elec.sh
 │   ├── cnn_svc_16_opt.sh
-├── **process.py** (Usage #2)
-├── **train.py** (Usage #3) 
-├── **test.py** (Usage #4) 
+├── process.py (Usage #2)
+├── train.py (Usage #3) 
+├── test.py (Usage #4) 
 ├── loadData.py  
 ├── mypackages
 │   ├── pytorchtools.py
