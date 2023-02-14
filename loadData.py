@@ -42,7 +42,7 @@ def loadData(com_list_n, which_data_mode, train_path, test_path, ft_path, is_fin
                         file_path_list.append(os.path.join(one_folder, file_name))
                         label_list.append(str(face))
 
-            elif ran_val == 1: # args.finetune
+            elif ran_val == 1: 
                 for face in com_list_n:
                     one_folder = os.path.join(ft_path, str(face))
                     file_name = os.listdir(one_folder)[i]
@@ -132,11 +132,11 @@ def visualizeData(Xtrain, ytrain, Xtest, ytest):
     random_idx = random.randint(0, len(Xtrain))
     plt.imshow(Xtrain[random_idx], cmap='gray')
     plt.title(f"Training example #{random_idx} (Class: {ytrain[random_idx]})")
-    #plt.axis('off')
+    plt.axis('off')
     plt.show()
 
     random_idx = random.randint(0, len(Xtest))
     plt.imshow(Xtest[random_idx], cmap='gray')
     plt.title(f"Testing example #{random_idx} (Class: {ytest[random_idx]})")
-    #plt.axis('off')
+    plt.axis('off')
     plt.show()
