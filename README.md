@@ -25,10 +25,14 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 
 ## Code structure
 ```
-├── main.py (Usage #3)
+├── Preprocessing (usage #3)
+│   ├── selectTrainableImgs.ipynb (Fig. S7b)
+│   ├── processBeforeDownsamp.ipynb (Fig. S7c-d and the first three steps in Fig. S7e)
+│   ├── downsampling.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
+│
+├── main.py (usage #4)
 ├── loadData.py  
-├── trainANNs.py 
-├── testPhosphenes.py  
+├── expModels.py 
 ├── mypackages
 │   ├── pytorchtools.py
 ├── scripts (training options)
@@ -37,7 +41,7 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 │   ├── cnn_svc_16_elec.sh
 │   ├── cnn_svc_16_opt.sh
 │
-├── Visualization (Optional usage #4)
+├── Visualization (optional usage #5)
 │   ├── ColormapsPIXGS.ipynb (Figs. 1a, S1a, 3a, S3a, Ext. Data Fig. 1a, and 1b)
 │   ├── Parallel.ipynb (Figs. 1e and S1e) 
 │   ├── Prediction.ipynb (Figs 1e, S1e, 3a-c, and S3a-c)  
@@ -67,22 +71,26 @@ conda activate artificialvision
 pip install -r requirements.txt   
 ```
 
-3. Preprocess the downloaded K-face datasets by following the step-by-step process from the jupyter notebook below:
+3. Preprocess the K-face datasets by following the step-by-step process from the jupyter notebooks below:
 ```
-selectTrainableImgs.ipynb # Select 4,972 images that are trainable (Fig. S7b).   
-processBeforeDownsamp.ipynb # Crop the images into squares, remove noisy backgrounds, and enhance the contrast of the images (Fig. S7c-d and the first three steps in Fig. S7e).   
-downsampling.ipynb # Make low-resolution phosphene images (the last three steps in Fig. S7e, S7f, and S7g).
-```
-
-3. Build and evaluate various machine learning (ML) models.
-```
-python main.py -demo_type train # 1. To train various ML models using high-resolution images (DEFAULT: opt/CNN_SVC/16).   
-python main.py -demo_type test # 2. To test the performances of ML models on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
+unzipAIHubData.py # Unzip all the original files.
+selCropTrainableImgs.ipynb # Select 4,972 images that are trainable and crop them into the dimension of 128 x 128.   
+mask.ipynb # Make the masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html).
+remBackEnhCont.ipynb # Remove noisy backgrounds and enhance the contrast of the images.   
+downsampling*.ipynb # Make low-resolution phosphene images.
 ```
 
-4. (OPTIONAL) Reproduce several figures from the manuscript.   
+4. Build and test machine learning (ML) models.   
 ```
-Visualization/
+python main.py # 1. Train ML models using high-resolution images 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).
+```
+
+5. (OPTIONAL) Reproduce several figures from the manuscript.   
+```
+ColormapsPIXGS.ipynb #
+Parallel.ipynb #
+Prediction.ipynb # 
+Wordclouds.ipynb # 
 ```
 <br />
 
@@ -104,7 +112,7 @@ If you want to report the results of our method or implement the framework, plea
 
 
 ## Contact
-Feel free to ask questions or leave comments through this email:
+If you have any questions regarding the code or paper, feel free to reach us at:
 ```
 namin0202@gmail.com (Na Min An)
 ```
