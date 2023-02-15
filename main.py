@@ -29,25 +29,26 @@ def main():
     meta_path = os.path.join(data_path, '210827_ANNA_Removing_uncontaminated_data.csv')
 
     train_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128_removed_train')
-    tr_camera_list = list(map(str, [4,5,6,7,8,9,10,14,15,16,17,18,19,20])) #4(C)
+    tr_camera_list = list(map(str, [4,5,6,7,8,9,10,14,15,16,17,18,19,20]))
     tr_light_list = list(map(str, [1,2,3,4,5,6, # 7: all black
                                    8,9,10,11,12,13,14,15,16,17,18,
-                                   19,20,21,22,23,24,25,26,27,28,29,30])) #2(L)
-    tr_accessory_list =['1'] #1(S)
-    tr_expression_list = ['1','2','3'] #3(E)
+                                   19,20,21,22,23,24,25,26,27,28,29,30]))
+    tr_accessory_list =['1']
+    tr_expression_list = ['1','2','3'] 
 
     test_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128_test')
     if args.data_type == 'NGB' or args.data_type == 'GB':
         test_path =  f'{args.test_path}_{args.data_type}'
     elif args.data_type == 'normal':
         test_path = f'{train_path}'
-    camera_list = ['4','7','10'] #4(C)
-    light_list = ['1'] #2(L)
-    accessory_list =['1'] #1(S)
-    expression_list = ['1','2','3'] #3(E)
+
+    camera_list = ['4','7','10'] 
+    light_list = ['1'] 
+    accessory_list =['1'] 
+    expression_list = ['1','2','3'] 
 
     if args.finetune:
-        ft_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128_removed_train_finetune')
+        ft_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128_removed_train_finetune') # 128 x 128 (16 GS)
 
     df = pd.read_csv(meta_path)
 
