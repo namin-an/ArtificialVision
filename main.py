@@ -12,13 +12,13 @@ from expModels import beginModeling
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 parser = argparse.ArgumentParser(description='The Alternative Models to Human Psychophysical Tests of Artificial Vision')
 
-parser.add_argument('--data_type', type=str, default='opt') # 'opt', 'elec', 'normal'
+parser.add_argument('--data_type', type=str, default='NGB') # 'NGB', 'GB', 'normal'
 parser.add_argument('--model_type1', type=str, default='') # '', '', 'PCA', 'PCA', '', '', '', '', '', '', '', ''
 parser.add_argument('--model_type2', type=str, default='') # 'PIXEL_SVC', 'PIXEL_LR', 'SVC', 'LR', 'CNN_SVC', 'CNN_LR','CNN_AlexNet2_SVC', 'CNN_AlexNet2', 'CNN_VggNet2_SVC', 'CNN_VggNet2', 'CNN_ResNet2_SVC', 'CNN_ResNet2', 
-parser.add_argument('--r', type=int, default=4) # 2, 4, 16
+parser.add_argument('--r', type=int, default=16) # 2, 4, 16
 parser.add_argument('--finetune', type=str, default='') # '', 'ft'
 parser.add_argument('--xai', type=bool, default=False)
-parser.add_argument('--base_path', type=str, default='C:\\Users\\Na Min An\\Desktop\\Development\\ArtificialVision')
+parser.add_argument('--base_path', type=str, default='[USER_PATH]\\ArtificialVision')
 
 
 def main():
@@ -37,7 +37,7 @@ def main():
     tr_expression_list = ['1','2','3'] #3(E)
 
     test_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128')
-    if args.data_type == 'opt' or args.data_type == 'elec':
+    if args.data_type == 'NGB' or args.data_type == 'GB':
         test_path =  f'{args.test_path}_{args.data_type}'
     elif args.data_type == 'normal':
         test_path = f'{train_path}'
@@ -129,7 +129,7 @@ def main():
                     instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, low_csv_file, auc_info_file, checkpoint_file, earlystop_file, roc_file) # INITIALIZATION
 
                     model, Xtrain, Xtest = instance.loadOrSaveModel1() # FEATURE EXTRACTION (PART 1)
-                    train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (OPTIONAL) VISUALIZATION 1|
+                    train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (NGBIONAL) VISUALIZATION 1|
                     ytest, yfit, yprob, _, y_test_oh= instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, old_uniq_labels2, file_path_list) # CLASSIFICATION (PART 2)
                     instance.ready4Visualization(ytest, yfit, yprob, file_path_list, old_uniq_labels2, unique_labels, y_test_oh) # VISUALIZATION 3
 
