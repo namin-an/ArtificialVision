@@ -1,9 +1,10 @@
 import zipfile36
 import os
 
-input_path = 'C:\\Users\\Na Min An\\Desktop\\Middle_Resolution_177' 
-output_path = 'C:\\Users\\Na Min An\\Desktop\\Middle_Resolution_177_unzipped'
-os.mkdir(output_path)
+data_path = '[USER_PATH]\\ArtificialVision\\data'
+input_path = os.path.join(data_path, 'Middle_Resolution_177') # 177 facial classes from the middle resolution data
+output_path = os.path.join(data_path, 'Middle_Resolution_177_unzipped')
+os.makedirs(output_path, exist_ok=True)
 
 for folder in os.listdir(input_path):
     print(folder)
