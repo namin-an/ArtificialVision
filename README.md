@@ -67,7 +67,7 @@ pip install -r requirements.txt
     - Step 1. Train ML models using high-resolution images.   
     - Step 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
     ```
-    python main.py 
+    scripts/
     ```
 
 
