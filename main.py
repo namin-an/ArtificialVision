@@ -36,7 +36,7 @@ def main():
     tr_accessory_list =['1'] #1(S)
     tr_expression_list = ['1','2','3'] #3(E)
 
-    test_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128')
+    test_path = os.path.join(data_path, 'Middle_Resolution_137_unzipped_parcropped_128_test')
     if args.data_type == 'NGB' or args.data_type == 'GB':
         test_path =  f'{args.test_path}_{args.data_type}'
     elif args.data_type == 'normal':
@@ -118,20 +118,20 @@ def main():
                 else:
                     print(f'\n START {m}th set {n}th comb (seed{seed}): comb{com_list[n]} \n')
 
-                    """1. Load processed data"""
-                    Xtrain, ytrain, _, old_uniq_labels, unique_items = loadData(com_list[n], 'train', train_path, test_path, ft_path, args.finetune, args.data_type, tr_accessory_list, tr_light_list, tr_expression_list, tr_camera_list, seed, args.r, args.model_type2)
-                    Xtest, ytest, file_path_list, old_uniq_labels2, test_unique_items = loadData(com_list[n], 'test', test_path, test_path, ft_path, args.finetune, args.data_type, accessory_list, light_list, expression_list, camera_list, seed, args.r, args.model_type2)
-                    assert set(old_uniq_labels) == set(old_uniq_labels2)
-                    assert set(unique_items) == set(test_unique_items)
-                    unique_labels = unique_items
+                    # 1. Load processed data
+                    Xtrain, ytrain, _, old_uniq_labels, new_uniq_labels = loadData(com_list[n], 'train', train_path, ft_path, args.finetune, args.data_type, tr_accessory_list, tr_light_list, tr_expression_list, tr_camera_list, seed, args.r, args.model_type2)
+                    Xtest, ytest, file_path_list, test_old_unique_labels, test_new_uniq_labels = loadData(com_list[n], 'test', test_path, ft_path, args.finetune, args.data_type, accessory_list, light_list, expression_list, camera_list, seed, args.r, args.model_type2)
+                    assert set(old_uniq_labels) == set(test_old_unique_labels)
+                    assert set(new_uniq_labels) == set(test_new_uniq_labels)
+                    unique_labels = new_uniq_labels
 
-                    """2. Train and test ML models"""
+                    # 2. Train and test ML models
                     instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, low_csv_file, auc_info_file, checkpoint_file, earlystop_file, roc_file) # INITIALIZATION
 
                     model, Xtrain, Xtest = instance.loadOrSaveModel1() # FEATURE EXTRACTION (PART 1)
                     train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (NGBIONAL) VISUALIZATION 1|
-                    ytest, yfit, yprob, _, y_test_oh= instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, old_uniq_labels2, file_path_list) # CLASSIFICATION (PART 2)
-                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, old_uniq_labels2, unique_labels, y_test_oh) # VISUALIZATION 3
+                    ytest, yfit, yprob, _, y_test_oh= instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, test_old_unique_labels, file_path_list) # CLASSIFICATION (PART 2)
+                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, test_old_unique_labels, unique_labels, y_test_oh) # VISUALIZATION 3
 
 
 if __name__ == 'main':
