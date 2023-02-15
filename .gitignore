@@ -1,6 +1,13 @@
 .*
 Visualization_deprecated/
-data/
+data/Middle_Resolution_137_unzipped_parcropped_128_removed_train
+data/Question_Banks_AI_Hub_final
+data/sample_for_dev_test_elec
+data/sample_for_dev_test_opt
+data/Opinions
+data/OpinionsVer1
+data/Screen_Shots
+
 figures/
 checkpoints/Checkpoint_*_demo.h5
 checkpoints/saved-unet_model-02-0.09.hdf5
