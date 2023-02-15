@@ -108,13 +108,8 @@ def main():
                 checkpoint_file = os.path.join(model_path, f'Checkpoint_{args.model_type2}{args.finetune}.pt') 
                 earlystop_file = os.path.join(model_path, f'Early_Stop_{args.model_type2}{args.finetune}.pt') 
                 high_csv_file = os.path.join(high_analysis_path, f'High_Level_Data_Analysis_{args.model_type1}_{args.model_type2}{args.finetune}.csv')
-                
-                low_csv_file = os.path.join(low_analysis_path, f'Classification Report_{args.model_type1}_{args.model_type2}.csv') 
-                auc_info_file = os.path.join(low_analysis_path, f'TP_FP_AUC_Dictionary_{args.model_type1}_{args.model_type2}.csv') 
-                roc_file = os.path.join(low_analysis_path, f'ROC_{args.model_type1}_{args.model_type2}.png') 
-                check_file = high_csv_file
 
-                if os.path.isfile(check_file) and not args.xai:
+                if os.path.isfile(high_csv_file) and not args.xai:
                     pass
                 else:
                     print(f'\n START {m}th set {n}th comb (seed{seed}): comb{com_list[n]} \n')
@@ -127,12 +122,12 @@ def main():
                     unique_labels = new_uniq_labels
 
                     # 2. Train and test ML models
-                    instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, low_csv_file, auc_info_file, checkpoint_file, earlystop_file, roc_file) # INITIALIZATION
+                    instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, checkpoint_file, earlystop_file) # INITIALIZATION
 
                     model, Xtrain, Xtest = instance.loadOrSaveModel1() # FEATURE EXTRACTION (PART 1)
-                    train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (NGBIONAL) VISUALIZATION 1|
-                    ytest, yfit, yprob, _, y_test_oh= instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, test_old_unique_labels, file_path_list) # CLASSIFICATION (PART 2)
-                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, test_old_unique_labels, unique_labels, y_test_oh) # VISUALIZATION 3
+                    train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (OPTIONAL) VISUALIZATION 1|
+                    ytest, yfit, yprob, _, _ = instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, test_old_unique_labels, file_path_list) # CLASSIFICATION (PART 2)
+                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, test_old_unique_labels) # VISUALIZATION 3
 
 
 if __name__ == 'main':
