@@ -23,12 +23,69 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 > Human data: [*/data/Human_Expert/211202/*]
 
 
+## Usage
+1. Clone this repository.
+```
+git clone https://github.com/namin-an/ArtificialVision.git   
+cd ArtificialVision   
+```
+
+
+2. Setup the conda environment.
+```
+conda create -n artificialvision python=3.9   
+conda activate artificialvision   
+pip install -r requirements.txt   
+```
+
+
+3. Preprocess the K-face datasets by following the step-by-step process from the jupyter notebooks below:
+
+  - Step 1. Unzip all the original files.
+  ```
+  unzipAIHubData.py
+  ```
+
+  - Step 2. Select 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
+  ```
+  selCropPhotos.ipynb  
+  ```
+
+  - Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and remove noisy backgrounds.
+  ```
+  genMaskremBack.ipynb
+  ```
+
+  - Step 4. Make low-resolution phosphene images (contrast enhancement + pixelation + grayscaling + phosphenizing).
+  ```
+  downsampling*.ipynb
+  ```
+  
+
+4. Build and test machine learning (ML) models.   
+
+  - Process 1. Train ML models using high-resolution images.   
+  - Process 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
+  ```
+  python main.py 
+  ```
+
+
+5. (OPTIONAL) Reproduce several figures from the manuscript.  
+
+  ```
+  Visualization/
+  ```
+<br />
+
+
 ## Code structure
 ```
 ├── Preprocessing (usage #3)
-│   ├── selectTrainableImgs.ipynb (Fig. S7b)
-│   ├── processBeforeDownsamp.ipynb (Fig. S7c-d and the first three steps in Fig. S7e)
-│   ├── downsampling.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
+│   ├── unzipAIHubData.py
+│   ├── selCropPhotos.ipynb (Fig. S7b-c)
+│   ├── genMaskremBack.ipynb (Fig. S7d and the first three steps in Fig. S7e)
+│   ├── downsampling*.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
 │
 ├── main.py (usage #4)
 ├── loadData.py  
@@ -46,7 +103,11 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 │   ├── Parallel.ipynb (Figs. 1e and S1e) 
 │   ├── Prediction.ipynb (Figs 1e, S1e, 3a-c, and S3a-c)  
 │   ├── Wordclouds.ipynb (Figs 1c, S1c, 5d, and S5d)
-├── checkpoints (freezed parameters for shallow ML model) 
+│
+├── checkpoints
+│   ├── saved-unet_model-02-0.09.hdf5 (usage #3: U-Net - can be given if requested)
+│   ├── Checkpoint_3.h5 (usage #5: Shallow ML model for non-Gaussian-blurred version)
+│   ├── Checkpoint_3.h5 (usage #5: Shallow ML model for Gaussian-blurred version)
 ```
 <br />
 
@@ -54,72 +115,6 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 ## Adaptations
 > Grad-CAM [*/pytorch_grad_cam*](https://github.com/jacobgil/pytorch-grad-cam) (Figs. 5a and S5a)  
 > Early-stopping [*/mypackages/pytorchtools.py*](https://github.com/Bjarten/early-stopping-pytorch) (for training)   
-<br />
-
-
-## Usage
-1. Clone this repository.
-```
-git clone https://github.com/namin-an/ArtificialVision.git   
-cd ArtificialVision   
-```
-
-2. Setup the conda environment.
-```
-conda create -n artificialvision python=3.9   
-conda activate artificialvision   
-pip install -r requirements.txt   
-```
-
-3. Preprocess the K-face datasets by following the step-by-step process from the jupyter notebooks below:
-
-Step 1. Unzip all the original files.
-```
-unzipAIHubData.py
-```
-
-Step 2. Select 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
-```
-selCropPhotos.ipynb  
-```
-
-Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html).
-```
-mask.ipynb
-```
-
-Step 4. Remove noisy backgrounds and enhance the contrast of the images with a histogram-equalization function.
-```
-remBackEnhImgs.ipynb  
-```
-
-Step 5. Make low-resolution phosphene images.
-```
-downsampling*.ipynb
-```
-
-4. Build and test machine learning (ML) models.   
-
-Process 1. Train ML models using high-resolution images.
-Process 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
-```
-python main.py 
-```
-
-5. (OPTIONAL) Reproduce several figures from the manuscript.   
-```
-
-ColormapsPIXGS.ipynb
-
-
-Parallel.ipynb
-
-
-Prediction.ipynb
-
-
-Wordclouds.ipynb
-```
 <br />
 
 
