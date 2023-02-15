@@ -19,8 +19,8 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 
 
 ## Datasets
-> Machine data: [K-face dataset](https://aihub.or.kr)
-> Human data: [*/data/Human_Expert/211202/*]
+> Machine data: [K-face dataset](https://aihub.or.kr)   
+> Human data: [*/data/Human_Expert/211202/*]()
 
 
 ## Usage
@@ -31,7 +31,7 @@ cd ArtificialVision
 ```
 
 
-2. Setup the conda environment.
+2. Setup the conda environment (python 3.9.13).
 ```
 conda create -n artificialvision python=3.9   
 conda activate artificialvision   
@@ -46,7 +46,7 @@ pip install -r requirements.txt
   unzipAIHubData.py
   ```
 
-  - Step 2. Select 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
+  - Step 2. SGBt 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
   ```
   selCropPhotos.ipynb  
   ```
@@ -58,14 +58,14 @@ pip install -r requirements.txt
 
   - Step 4. Make low-resolution phosphene images (contrast enhancement + pixelation + grayscaling + phosphenizing).
   ```
-  downsampling*.ipynb
+  downsamp*.ipynb
   ```
   
 
 4. Build and test machine learning (ML) models.   
 
-  - Process 1. Train ML models using high-resolution images.   
-  - Process 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
+  - Step 1. Train ML models using high-resolution images.   
+  - Step 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
   ```
   python main.py 
   ```
@@ -85,7 +85,7 @@ pip install -r requirements.txt
 │   ├── unzipAIHubData.py
 │   ├── selCropPhotos.ipynb (Fig. S7b-c)
 │   ├── genMaskremBack.ipynb (Fig. S7d and the first three steps in Fig. S7e)
-│   ├── downsampling*.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
+│   ├── downsamp*.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
 │
 ├── main.py (usage #4)
 ├── loadData.py  
@@ -93,10 +93,10 @@ pip install -r requirements.txt
 ├── mypackages
 │   ├── pytorchtools.py
 ├── scripts (training options)
-│   ├── cnn_svc_4_elec.sh
-│   ├── cnn_svc_4_opt.sh
-│   ├── cnn_svc_16_elec.sh
-│   ├── cnn_svc_16_opt.sh
+│   ├── cnn_svc_4_GB.sh
+│   ├── cnn_svc_4_NGB.sh
+│   ├── cnn_svc_16_GB.sh
+│   ├── cnn_svc_16_NGB.sh
 │
 ├── Visualization (optional usage #5)
 │   ├── ColormapsPIXGS.ipynb (Figs. 1a, S1a, 3a, S3a, Ext. Data Fig. 1a, and 1b)
@@ -107,7 +107,7 @@ pip install -r requirements.txt
 ├── checkpoints
 │   ├── saved-unet_model-02-0.09.hdf5 (usage #3: U-Net - can be given if requested)
 │   ├── Checkpoint_3.h5 (usage #5: Shallow ML model for non-Gaussian-blurred version)
-│   ├── Checkpoint_3.h5 (usage #5: Shallow ML model for Gaussian-blurred version)
+│   ├── Checkpoint_4.h5 (usage #5: Shallow ML model for Gaussian-blurred version)
 ```
 <br />
 
