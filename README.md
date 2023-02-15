@@ -20,7 +20,7 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 
 ## Datasets
 > Machine data: [K-face dataset](https://aihub.or.kr)   
-> Human data: [*/data/Human_Expert/211202/*]()
+> Human data: [ours](https://github.com/namin-an/ArtificialVision/tree/main/data/Human_Expert/211202)
 
 
 ## Usage
@@ -41,34 +41,34 @@ pip install -r requirements.txt
 
 3. Preprocess the K-face datasets by following the step-by-step process from the jupyter notebooks below:
 
-  - Step 1. Unzip all the original files.
-  ```
-  unzipAIHubData.py
-  ```
+    - Step 1. Unzip all the original files.
+    ```
+    unzipAIHubData.py
+    ```
 
-  - Step 2. SGBt 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
-  ```
-  selCropPhotos.ipynb  
-  ```
+    - Step 2. SGBt 4,972 images that are recognizable and crop them into the dimension of 128 x 128.
+    ```
+    selCropPhotos.ipynb  
+    ```
 
-  - Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and remove noisy backgrounds.
-  ```
-  genMaskremBack.ipynb
-  ```
+    - Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and remove noisy backgrounds.
+    ```
+    genMaskremBack.ipynb
+    ```
 
-  - Step 4. Make low-resolution phosphene images (contrast enhancement + pixelation + grayscaling + phosphenizing).
-  ```
-  downsamp*.ipynb
-  ```
-  
+    - Step 4. Make low-resolution phosphene images (contrast enhancement + grayscaling + pixelation + phosphenizing).
+    ```
+    downsamp.ipynb
+    ```
+          
 
 4. Build and test machine learning (ML) models.   
 
-  - Step 1. Train ML models using high-resolution images.   
-  - Step 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
-  ```
-  python main.py 
-  ```
+    - Step 1. Train ML models using high-resolution images.   
+    - Step 2. Evaluate their performances on low-resolution images (DEFAULT: opt/CNN_SVC/16).   
+    ```
+    python main.py 
+    ```
 
 
 5. (OPTIONAL) Reproduce several figures from the manuscript.  
@@ -85,7 +85,7 @@ pip install -r requirements.txt
 │   ├── unzipAIHubData.py
 │   ├── selCropPhotos.ipynb (Fig. S7b-c)
 │   ├── genMaskremBack.ipynb (Fig. S7d and the first three steps in Fig. S7e)
-│   ├── downsamp*.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
+│   ├── downsamp.ipynb (the last three steps in Fig. S7e, S7f, and S7g)
 │
 ├── main.py (usage #4)
 ├── loadData.py  
