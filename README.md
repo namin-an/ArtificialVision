@@ -19,7 +19,7 @@ Na Min An, Hyeonhee Roh, Sein Kim, Jae Hun Kim, and Maesoon Im
 
 
 ## Datasets
-> Machine data: [K-face dataset](https://aihub.or.kr)   
+> Machine data: [AI Hub K-face dataset](https://aihub.or.kr)   
 > Human data: [ours](https://github.com/namin-an/ArtificialVision/tree/main/data/Human_Expert/211202)
 
 
@@ -113,8 +113,8 @@ pip install -r requirements.txt
 
 
 ## Adaptations
-> Grad-CAM [*/pytorch_grad_cam*](https://github.com/jacobgil/pytorch-grad-cam) (Figs. 5a and S5a)  
-> Early-stopping [*/mypackages/pytorchtools.py*](https://github.com/Bjarten/early-stopping-pytorch) (for training)   
+> Grad-CAM [jacobgil/pytorch_grad_cam](https://github.com/jacobgil/pytorch-grad-cam) (Figs. 5a and S5a)  
+> Early-stopping [mypackages/pytorchtools.py](https://github.com/Bjarten/early-stopping-pytorch) (for training)   
 <br />
 
 
