@@ -240,7 +240,7 @@ class beginModeling():
             # For the pixel baseline model, or when model_type == 'PIXEL_MML' or model_type == 'PIXEL_CEL'
             self.pixel = Linear(in_features=128*128, out_features=beginModeling.n_class).to(self.device)
 
-            # For AlexNet, or when model_type == 'CNN_AlexNet2_MML' or model_type == 'CNN_AlexNet2'
+            # For AlexNet, or when model_type == 'CNN_AlexNet2_MML' or model_type == 'CNN_AlexNet2_CEL'
             # Reference: source code for torchvision.models.alexnet
             self.alexnet_features = nn.Sequential(
                 Conv2d(1, 64, kernel_size=11, stride=4, padding=2).to(self.device),
@@ -268,7 +268,7 @@ class beginModeling():
                 Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class, bias=True).to(self.device)
             )
 
-            # For VGG, or when model_type == 'CNN_VGG2_MML' or model_type == 'CNN_VGG2'
+            # For VGG, or when model_type == 'CNN_VGG2_MML' or model_type == 'CNN_VGG2_CEL'
             # Reference: source code for torchvision.models.vggnet
             self.vggnet_features = nn.Sequential(
                 Conv2d(1, 64, kernel_size=3, stride=1, padding=1).to(self.device),
@@ -304,7 +304,7 @@ class beginModeling():
                 Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class, bias=True).to(self.device)
             )
 
-            # For ResNet, or when model_type == 'CNN_ResNet2_MML' or model_type == 'CNN_ResNet2'
+            # For ResNet, or when model_type == 'CNN_ResNet2_MML' or model_type == 'CNN_ResNet2_CEL'
             # Reference: source code for torchvision.models.resnet
             # 2*padding = kernel_size - 1
             # Ex. 1: padding=1, kernel_size=3
@@ -436,7 +436,7 @@ class beginModeling():
                 xb = self.pixel(xb)
                 out = xb.to(self.device) 
 
-            elif self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_VGGNet':
+            elif self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_VGG':
                 xb = xb.permute(0, 3, 1, 2) # (batch_size, w, h, c) -> (batch_size, c, w, h)
                 if self.model_type2 == 'CNN_ResNet':
                     model = torchvision.models.resnet18(pretrained=False).to(self.device)
@@ -446,14 +446,14 @@ class beginModeling():
                     model = torchvision.models.alexnet(pretrained=False).to(self.device)
                     num_infeat = model.classifier[-1].in_features
                     model.classifier[-1] = Linear(num_infeat, beginModeling.n_class).to(self.device)
-                elif self.model_type2 == 'CNN_VGGNet':
+                elif self.model_type2 == 'CNN_VGG':
                     model = torchvision.models.vgg16(pretrained=False).to(self.device)               
                     num_infeat = model.classifier[-1].in_features
                     model.classifier[-1] = Linear(num_infeat, beginModeling.n_class).to(self.device)
                 xb = model(xb)
                 out = xb.to(self.device)
             
-            elif self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_AlexNet2_MML':
+            elif self.model_type2 == 'CNN_AlexNet2_CEL' or self.model_type2 == 'CNN_AlexNet2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.alexnet_features(xb)
                 xb = self.alexnet_avgpool(xb)
@@ -462,7 +462,7 @@ class beginModeling():
                 out = xb.to(self.device)
                 return out
             
-            elif self.model_type2 == 'CNN_VggNet2' or self.model_type2 == 'CNN_VggNet2_MML':
+            elif self.model_type2 == 'CNN_VGG2_CEL' or self.model_type2 == 'CNN_VGG2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.vggnet_features(xb)
                 xb = self.vggnet_avgpool(xb)
@@ -471,7 +471,7 @@ class beginModeling():
                 out = xb.to(self.device)
                 return out
 
-            elif self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_ResNet2_MML':
+            elif self.model_type2 == 'CNN_ResNet2_CEL' or self.model_type2 == 'CNN_ResNet2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.resnet_conv(xb)
 
@@ -561,9 +561,9 @@ class beginModeling():
                     for (images, labels) in train_loader:
                         images, labels = images.to(self.device), labels.to(self.device)
                         out = self(images) 
-                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
+                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2_CEL' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2_CEL' or self.model_type2 == 'CNN_VGG2_CEL':
                             loss = F.cross_entropy(out, labels) 
-                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VggNet2_MML':
+                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VGG2_MML':
                             loss = F.multi_margin_loss(out, labels) 
                         _, preds = torch.max(out, dim=1) 
                         acc = torch.tensor(torch.sum(preds==labels).item() / len(preds))
@@ -578,9 +578,9 @@ class beginModeling():
                     for (images, labels) in val_loader:
                         images, labels = images.to(self.device), labels.to(self.device)
                         out = self(images)
-                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
+                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2_CEL' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2_CEL' or self.model_type2 == 'CNN_VGG2_CEL':
                             loss = F.cross_entropy(out, labels) 
-                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VggNet2_MML':
+                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VGG2_MML':
                             loss = F.multi_margin_loss(out, labels) 
                         _, preds = torch.max(out, dim=1) # 
                         acc = torch.tensor(torch.sum(preds==labels).item() / len(preds))
