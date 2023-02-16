@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='The Alternative Models to Human Ps
 
 parser.add_argument('--data_type', type=str, default='NGB') # 'NGB', 'GB', 'normal'
 parser.add_argument('--model_type1', type=str, default='') # '', '', 'PCA', 'PCA', '', '', '', '', '', '', '', ''
-parser.add_argument('--model_type2', type=str, default='') # 'PIXEL_SVC', 'PIXEL_LR', 'SVC', 'LR', 'CNN_SVC', 'CNN_LR','CNN_AlexNet2_SVC', 'CNN_AlexNet2', 'CNN_VggNet2_SVC', 'CNN_VggNet2', 'CNN_ResNet2_SVC', 'CNN_ResNet2', 
+parser.add_argument('--model_type2', type=str, default='') # 'PIXEL_MML', 'PIXEL_CEL', 'MML', 'CEL', 'CNN_MML', 'CNN_CEL','CNN_AlexNet2_MML', 'CNN_AlexNet2', 'CNN_VggNet2_MML', 'CNN_VggNet2', 'CNN_ResNet2_MML', 'CNN_ResNet2', 
 parser.add_argument('--r', type=int, default=16) # 2, 4, 16
 parser.add_argument('--finetune', type=str, default='') # '', 'ft'
 parser.add_argument('--xai', type=bool, default=False)
@@ -96,14 +96,13 @@ def main():
                 preprocessed_data_path =  os.path.join(data_path, f'comb{n}')
                 model_path = os.path.join(preprocessed_data_path, 'Saved_Models')
                 high_analysis_path = os.path.join(preprocessed_data_path, f'High_Analysis_{args.data_type}')
-                low_analysis_path = os.path.join(preprocessed_data_path, f'Low_Analysis_{args.data_type}')
 
                 os.makedirs(data_path, exist_ok=True)
                 os.makedirs(preprocessed_data_path, exist_ok=True) 
                 os.makedirs(model_path, exist_ok=True)
                 os.makedirs(high_analysis_path, exist_ok=True)
 
-                model_file1 = os.path.join(model_path, f'Model_{args.model_type1}{args.finetune}')
+                model_file1 = os.path.join(model_path, f'Model_{args.model_type1}{args.finetune}.gz')
                 model_file2 = os.path.join(model_path, f'Model_{args.model_type2}{args.finetune}.pt')
                 checkpoint_file = os.path.join(model_path, f'Checkpoint_{args.model_type2}{args.finetune}.pt') 
                 earlystop_file = os.path.join(model_path, f'Early_Stop_{args.model_type2}{args.finetune}.pt') 
@@ -119,15 +118,14 @@ def main():
                     Xtest, ytest, file_path_list, test_old_unique_labels, test_new_uniq_labels = loadData(com_list[n], 'test', test_path, ft_path, args.finetune, args.data_type, accessory_list, light_list, expression_list, camera_list, seed, args.r, args.model_type2)
                     assert set(old_uniq_labels) == set(test_old_unique_labels)
                     assert set(new_uniq_labels) == set(test_new_uniq_labels)
-                    unique_labels = new_uniq_labels
 
                     # 2. Train and test ML models
-                    instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, checkpoint_file, earlystop_file) # INITIALIZATION
+                    instance = beginModeling(device, args.model_type1, args.model_type2, Xtrain, ytrain, Xtest, ytest, new_uniq_labels, model_file1, model_file2, high_csv_file, checkpoint_file, earlystop_file) # INITIALIZATION (PART 0)
 
-                    model, Xtrain, Xtest = instance.loadOrSaveModel1() # FEATURE EXTRACTION (PART 1)
-                    train_loader, val_loader, test_loader = instance.convertAndVisualData(model, Xtrain, Xtest, ytrain, ytest) # (OPTIONAL) VISUALIZATION 1|
-                    ytest, yfit, yprob, _, _ = instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, Xtrain, Xtest, test_old_unique_labels, file_path_list) # CLASSIFICATION (PART 2)
-                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, test_old_unique_labels) # VISUALIZATION 3
+                    Xtrain, Xtest = instance.loadOrSaveModel1() # FEATURE EXTRACTION FOR PCA (PART 1)
+                    train_loader, val_loader, test_loader = instance.convertAndVisualData(Xtrain, Xtest) # CONVERSION TO TENSORS (PART 2)
+                    ytest, yfit, yprob, _, _ = instance.loadOrSaveModel2andEval(train_loader, val_loader, test_loader, test_old_unique_labels) # CLASSIFICATION (PART 3)
+                    instance.ready4Visualization(ytest, yfit, yprob, file_path_list, test_old_unique_labels) # VISUALIZATION (PART 4)
 
 
 if __name__ == 'main':
