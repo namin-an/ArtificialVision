@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='The Alternative Models to Human Ps
 
 parser.add_argument('--data_type', type=str, default='NGB') # 'NGB', 'GB', 'normal'
 parser.add_argument('--model_type1', type=str, default='') # '', '', 'PCA', 'PCA', '', '', '', '', '', '', '', ''
-parser.add_argument('--model_type2', type=str, default='') # 'PIXEL_MML', 'PIXEL_CEL', 'MML', 'CEL', 'CNN_MML', 'CNN_CEL','CNN_AlexNet2_MML', 'CNN_AlexNet2', 'CNN_VggNet2_MML', 'CNN_VggNet2', 'CNN_ResNet2_MML', 'CNN_ResNet2', 
+parser.add_argument('--model_type2', type=str, default='') # 'PIXEL_MML', 'PIXEL_CEL', 'MML', 'CEL', 'CNN_MML', 'CNN_CEL','CNN_AlexNet2_MML', 'CNN_AlexNet2_CEL', 'CNN_VGG2_MML', 'CNN_VGG2_CEL', 'CNN_ResNet2_MML', 'CNN_ResNet2_CEL', 
 parser.add_argument('--r', type=int, default=16) # 2, 4, 16
 parser.add_argument('--finetune', type=str, default='') # '', 'ft'
 parser.add_argument('--xai', type=bool, default=False)
