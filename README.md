@@ -76,7 +76,7 @@ pip install -r requirements.txt
 ├── mypackages
 │   ├── pytorchtools.py
 ├── scripts (training options)
-│   ├── [model_type]_[loss function type]_[facial class size]_[data type]
+│   ├── [model_type]_[loss function type]_[facial class size]_[data type].sh
 │
 ├── Visualization (optional usage #5)
 │   ├── ColormapsPIXGS.ipynb (Figs. 1a, S1a, 3a, S3a, Ext. Data Fig. 1a, and 1b)
@@ -94,7 +94,7 @@ pip install -r requirements.txt
 
 ## Adaptations
 > Grad-CAM [jacobgil/pytorch_grad_cam](https://github.com/jacobgil/pytorch-grad-cam) (Figs. 5a and S5a)  
-> Early-stopping [mypackages/pytorchtools.py](https://github.com/Bjarten/early-stopping-pytorch) (for training)   
+> Early-stopping [Bjarten/early-stopping-pytorch](https://github.com/Bjarten/early-stopping-pytorch)  
 <br />
 
 
