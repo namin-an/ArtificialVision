@@ -47,18 +47,18 @@ pip install -r requirements.txt
     unzipAIHubData.py
     ```
 
-    - Step 2. SGBt 4,972 images that are recognizable and crop them into the dimension of 128 x 128 following the code steps written in [Processing/selCropPhotos.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/selCropPhotos.ipynb)
+    - Step 2. SGBt 4,972 images that are recognizable and crop them into the dimension of 128 x 128 following the code steps written in [Processing/selCropPhotos.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/selCropPhotos.ipynb).
 
-    - Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and remove noisy backgrounds utilizing [Processing/genMaskremBack.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/genMaskremBack.ipynb)
+    - Step 3. Make customized masks for K-Face datasets using the U-Net pretrained on [CelebA-HQ dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and remove noisy backgrounds utilizing [Processing/genMaskremBack.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/genMaskremBack.ipynb).
 
-    - Step 4. Make low-resolution phosphene images (contrast enhancement + grayscaling + pixelation + phosphenizing) using [Processing/downsamp.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/downsamp.ipynb)
+    - Step 4. Make low-resolution phosphene images (contrast enhancement + grayscaling + pixelation + phosphenizing) using [Processing/downsamp.ipynb](https://github.com/namin-an/ArtificialVision/blob/main/Preprocessing/downsamp.ipynb).
           
 
 4. Build and train machine learning (ML) models with original high-resolution images and evaluate their performances on low-resolution images by running the shell scripts placed under [scripts/](https://github.com/namin-an/ArtificialVision/tree/main/scripts).
 
 
 
-5. (OPTIONAL) Reproduce several figures from the manuscript ([Visualization/](https://github.com/namin-an/ArtificialVision/tree/main/Visualization))  
+5. (OPTIONAL) Reproduce several figures from the manuscript ([Visualization/](https://github.com/namin-an/ArtificialVision/tree/main/Visualization)).  
 <br />
 
 
