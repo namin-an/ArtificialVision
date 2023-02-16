@@ -1,50 +1,37 @@
 import os
-import time
-import random
-import itertools
-import argparse
-from PIL import Image
 import numpy as np 
 import matplotlib.pyplot as plt 
 import pandas as pd
-from pandas import DataFrame
 import joblib
 import gzip
 import collections
-import seaborn as sns
-import sklearn
 from sklearn.decomposition import PCA
-from sklearn.svm import SVC, LinearSVC
-from sklearn.model_selection import train_test_split, GridSearchCV
 import tensorflow as tf
 import torch
 import torchvision
 import torch.nn as nn
-import torchvision.transforms as T
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split, TensorDataset
-from torch.nn import Linear, ReLU, CrossEntropyLoss, MultiMarginLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, AdaptiveAvgPool2d
-from torch.optim import Adam
+from torch.nn import Linear, ReLU, Conv2d, MaxPool2d, BatchNorm2d, AdaptiveAvgPool2d
+
+from mypackages import pytorchtools
 
 print(torch.__version__)
 print(torch.cuda.get_self.device_name(0)) # my GPU
 print(torch.cuda.is_available()) 
 print(torch.version.cuda)
 
-from mypackages import pytorchtools
-
 
 class beginModeling():
-    # class variables
     n_components = 128
     val_percent = 0.15
     batch_size = 16
-    num_epoch = 1000 #1000
-    learning_rate = 1e-4 # 1e-4 
+    num_epoch = 1000 
+    learning_rate = 1e-4 
     n_class = 4
 
 
-    # INITIALIZATION
+    # INITIALIZATION (PART 0)
     def __init__(self, device, model_type1, model_type2, Xtrain, ytrain, Xtest, ytest, unique_labels, model_file1, model_file2, high_csv_file, checkpoint_file, earlystop_file):
 
         self.device = device
@@ -68,7 +55,7 @@ class beginModeling():
     def loadOrSaveModel1(self):
             
         if os.path.isfile(self.model_file1): 
-            print(f'Loading a model 1 ({self.model_type1})...')            
+            print(f'Loading the model 1 ({self.model_type1})...')            
 
             if self.model_type1 == 'PCA':
                 with gzip.GzipFile(self.model_file1, 'rb') as f:
@@ -96,55 +83,55 @@ class beginModeling():
                     y, yhat = targets, model(inputs)
                     ytest, ytest_fit = np.append(ytest, y), np.append(ytest_fit, yhat)
                 Xtrain, Xtest = ytrain_fit, ytest_fit
-                print('CNN transformed data shape: ', Xtrain.shape, Xtest.shape) # (batch, 1, beginModeling.n_components)
+                print('CNN transformed data shape: ', Xtrain.shape, Xtest.shape)
 
 
         else: 
-            print(f'Making a model 1 ({self.model_type1})...')
+            print(f'Building the model 1 ({self.model_type1})...')
 
             if self.model_type1 == 'PCA':
                 Xtrain = self.Xtrain.reshape(self.Xtrain.shape[0], self.Xtrain.shape[1]*self.Xtrain.shape[2])
                 Xtest = self.Xtest.reshape(self.Xtest.shape[0], self.Xtest.shape[1]*self.Xtest.shape[2])
                 model = PCA(beginModeling.n_components, whiten=True, random_state=42)
                 model.fit(Xtrain)
+
                 plt.plot(np.cumsum(model.explained_variance_ratio_))
                 plt.xlabel('Number of Components')
                 plt.ylabel('Cumulative Explained Variance')
                 plt.show()
-                print(f'Saving a model 1 ({self.model_type1})...')
+
+                print(f'Saving the model 1 ({self.model_type1})...')
                 with gzip.GzipFile(self.model_file1, 'wb', compresslevel=3) as f:
                     joblib.dump(model, f) 
+
                 print("Original data shape: ", Xtrain.shape, Xtest.shape)
                 Xtrain, Xtest = model.transform(Xtrain), model.transform(Xtest)
                 print("PCA transformed data shape: ", Xtrain.shape, Xtest.shape)
 
             elif self.model_type1 == '':
-                model, Xtrain, Xtest = None, self.Xtrain, self.Xtest
+                Xtrain, Xtest = self.Xtrain, self.Xtest
 
-        return model, Xtrain, Xtest
+        return Xtrain, Xtest
     
     
-    # (OPTIONAL) VISUALIZATION (PART 1)
-    def convertAndVisualData(self, model, Xtrain, Xtest, ytrain, ytest):
+    # CONVERSION TO TENSORS (PART 2)
+    def convertAndVisualData(self, Xtrain, Xtest):
        
-        inputs, targets, testinputs, testtargets = torch.from_numpy(Xtrain).float(), torch.from_numpy(self.ytrain).long(), torch.from_numpy(Xtest).float(), torch.from_numpy(self.ytest).long() # long: integers
+        inputs, targets, testinputs, testtargets = torch.from_numpy(Xtrain).float(), torch.from_numpy(self.ytrain).long(), torch.from_numpy(Xtest).float(), torch.from_numpy(self.ytest).long() 
         dataset, testdataset = TensorDataset(inputs, targets), TensorDataset(testinputs, testtargets)
 
-        if self.model_type2 != 'SVC2':
-            val_size = int(self.Xtrain.shape[0]*beginModeling.val_percent)
-            train_size = self.Xtrain.shape[0] - val_size
-            train_ds, val_ds = random_split(dataset, [train_size, val_size])
+        val_size = int(self.Xtrain.shape[0]*beginModeling.val_percent)
+        train_size = self.Xtrain.shape[0] - val_size
+        train_ds, val_ds = random_split(dataset, [train_size, val_size])
 
-            train_loader, val_loader = DataLoader(train_ds, beginModeling.batch_size, shuffle=True), DataLoader(val_ds, beginModeling.batch_size*2, shuffle=True)
-            test_loader = DataLoader(testdataset, shuffle=False) 
-        else:
-            train_loader, val_loader, test_loader = None, None, None
+        train_loader, val_loader = DataLoader(train_ds, beginModeling.batch_size, shuffle=True), DataLoader(val_ds, beginModeling.batch_size*2, shuffle=True)
+        test_loader = DataLoader(testdataset, shuffle=False) 
         
         return train_loader, val_loader, test_loader
 
 
-    ## CLASSIFICATION (PART 2)
-    def loadOrSaveModel2andEval(self, train_loader, val_loader, test_loader, Xtrain, Xtest, old_uniq_labels2, file_path_list):
+    # CLASSIFICATION (PART 3)
+    def loadOrSaveModel2andEval(self, train_loader, val_loader, test_loader, test_old_unique_labels):
 
         def flatten(L):
             for item in L:
@@ -164,76 +151,54 @@ class beginModeling():
             temp_list2 = list(map(float, temp_list))
             return temp_list2
 
-        #Load or save a model.#
+        # 1) Load or save the model.
         if os.path.isfile(self.model_file2): 
-            print(f'Loading a model 2 ({self.model_type2})...')
-            if self.model_type2 == 'LR' or self.model_type2 == 'SVC' or self.model_type2 == 'CNN_LR' or self.model_type2 == 'CNN_SVC' or self.model_type2 == 'PIXEL_LR' or self.model_type2 == 'PIXEL_SVC' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_ResNet2_SVC' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_AlexNet2_SVC' or self.model_type2 == 'CNN_VggNet2' or self.model_type2 == 'CNN_VggNet2_SVC':
-                model = torch.load(self.model_file2)
-                if os.path.isfile(self.checkpoint_file):
-                    os.remove(self.checkpoint_file)
-                if os.path.isfile(self.earlystop_file):
-                    os.remove(self.earlystop_file)
+            print(f'Loading the model 2 ({self.model_type2})...')
 
-            elif self.model_type2 == 'SVC2':
-                with gzip.GzipFile(self.model_file2, 'rb') as f:
-                    model = joblib.load(f)
+            model = torch.load(self.model_file2)
+            if os.path.isfile(self.checkpoint_file):
+                os.remove(self.checkpoint_file)
+            if os.path.isfile(self.earlystop_file):
+                os.remove(self.earlystop_file)
 
         else:
-            print(f'Making a model 2 ({self.model_type2})...')
+            print(f'Building the model 2 ({self.model_type2})...')
 
             m1, m2 = self.model_type1, self.model_type2
             model = self.LR_Model(m1, m2) 
 
-            model, avg_train_losses, avg_valid_losses, avg_train_accs, avg_valid_accs = model.fit(beginModeling.num_epoch, beginModeling.learning_rate, model, train_loader, val_loader, self.checkpoint_file, self.earlystop_file) 
+            model, _, _, _, _ = model.fit(beginModeling.num_epoch, beginModeling.learning_rate, model, train_loader, val_loader, self.checkpoint_file, self.earlystop_file) 
         
-            print(f'Saving a model 2 ({self.model_type2})...')
+            print(f'Saving the model 2 ({self.model_type2})...')
             torch.save(model, self.model_file2) 
         
 
-        #Fit the model.#
-        print(f'Evaluating a model 2 ({self.model_type2})...')
-        if self.model_type2 == 'SVC2':
-            res_model = model.best_estimator_ 
-            print('Best Estimator: ', res_model)
+        # 2) Fit the model.
+        ytest, yfit, yprob = np.array([]), np.array([]), np.array([])
+        model = model.to(self.device)
+        model.eval()
 
-            testinputs, testtargets = torch.from_numpy(Xtest).float(), torch.from_numpy(self.ytest).long()
-            testdataset = TensorDataset(testinputs, testtargets)
-            test_loader = DataLoader(testdataset, shuffle=False)
+        for (inputs, targets) in test_loader:
+            inputs, targets = inputs.to(self.device), targets.to(self.device)
+            inputs.requires_grad_()
+            y = targets
 
-            yfit, ytest = np.array([]), np.array([])
-            yprob = np.array([])
-            for i, (inputs, targets) in enumerate(test_loader):
-                yhat, y = res_model.predict(inputs), targets
-                ytest, yfit = np.append(ytest, y), np.append(yfit, yhat)
-
-        elif self.model_type2 == 'LR' or self.model_type2 == 'SVC' or self.model_type2 == 'CNN_LR' or self.model_type2 == 'CNN_SVC' or self.model_type2 == 'PIXEL_LR' or self.model_type2 == 'PIXEL_SVC' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_ResNet2_SVC' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_AlexNet2_SVC' or self.model_type2 == 'CNN_VggNet2' or self.model_type2 == 'CNN_VggNet2_SVC':
-            ytest, yfit, yprob = np.array([]), np.array([]), np.array([])
             model = model.to(self.device)
-            model.eval()
+            yhat = model(inputs) 
+            pred_probs = yhat.detach() 
+            _, yhat = torch.max(yhat, dim=1) 
+            y, yhat = y.cpu().numpy(), yhat.cpu().numpy()
+            pred_probs = gpu2cpu(flatten(pred_probs))
+            ytest, yfit, yprob = np.append(ytest, y), np.append(yfit, yhat), np.append(yprob, pred_probs)
 
-            for i, (inputs, targets) in enumerate(test_loader):
-                inputs, targets = inputs.to(self.device), targets.to(self.device)
-                inputs.requires_grad_()
-                y = targets
+        yprob = yprob.reshape(yfit.shape[0], beginModeling.n_class)
 
-                model = model.to(self.device)
-                yhat = model(inputs) 
-                pred_probs = yhat.detach() 
-                _, yhat = torch.max(yhat, dim=1) 
-                y, yhat = y.cpu().numpy(), yhat.cpu().numpy()
-                pred_probs = gpu2cpu(flatten(pred_probs))
-                ytest, yfit, yprob = np.append(ytest, y), np.append(yfit, yhat), np.append(yprob, pred_probs)
+        print("Real ppl.: ", ytest.shape, "Predicted ppl.: ", yfit.shape, "Predicted prob.: ", yprob.shape) # predicted facial class/actual facial class/predicted probability 
 
-                _, _, _, f1, f2 = file_path_list[i].split('\\')
-
-            yprob = yprob.reshape(yfit.shape[0], beginModeling.n_class)
-
-        print("Real ppl.: ", ytest.shape, "Predicted ppl.: ", yfit.shape, "Predicted prob.: ", yprob.shape) # predicted face-class / actual face-class / predicted probability 
-
-        #Getting ready to evaluate the model.#
+        # Change the label type.
         y_test_oh = tf.keras.utils.to_categorical(ytest)
         for idx in range(ytest.shape[0]):
-            temp_test, temp_fit = old_uniq_labels2[int(ytest[idx])], old_uniq_labels2[int(yfit[idx])]
+            temp_test, temp_fit = test_old_unique_labels[int(ytest[idx])], test_old_unique_labels[int(yfit[idx])]
             ytest[idx], yfit[idx] = temp_test, temp_fit
 
         return ytest, yfit, yprob, model, y_test_oh
@@ -241,7 +206,6 @@ class beginModeling():
 
     class LR_Model(torch.nn.Module):
 
-        # 1) Initialize the class.
         def __init__(self, m1, m2):
             super().__init__() 
 
@@ -250,8 +214,8 @@ class beginModeling():
             # For the logistic regression model, or when model_type1 == 'PCA'
             self.linear = Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class).to(self.device) # Logistic Regression, # of input nodes & # of output nodes
 
-            # For the 'lite' CNN, or when model_type == 'CNN_LR' or model_type == 'CNN_SVC'
-            # Oliveira[2017], 23 classes, 99% end-to-end acc., 25,000 test images
+            # For the 'lite' CNN, or when model_type == 'CNN_MML' or model_type == 'CNN_CEL'
+            # Oliveira[2017], 23 classes, 99% accuracy, 25,000 test images
             self.cnn_num_block = nn.Sequential(
                 Conv2d(in_channels=1, out_channels=32, kernel_size=7, stride=1, padding=0).to(self.device),
                 ReLU(inplace=True).to(self.device), # perform th eoperation w/ using any additional memory
@@ -273,9 +237,10 @@ class beginModeling():
                  ReLU(inplace=True).to(self.device),
                  Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class, bias=True)).to(self.device)
 
-            # For the pixel baseline model, or when model_type == 'PIXEL_LR' or model_type == 'PIXEL_SVC'
+            # For the pixel baseline model, or when model_type == 'PIXEL_MML' or model_type == 'PIXEL_CEL'
             self.pixel = Linear(in_features=128*128, out_features=beginModeling.n_class).to(self.device)
 
+            # For AlexNet, or when model_type == 'CNN_AlexNet2_MML' or model_type == 'CNN_AlexNet2'
             # Reference: source code for torchvision.models.alexnet
             self.alexnet_features = nn.Sequential(
                 Conv2d(1, 64, kernel_size=11, stride=4, padding=2).to(self.device),
@@ -303,6 +268,7 @@ class beginModeling():
                 Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class, bias=True).to(self.device)
             )
 
+            # For VGG, or when model_type == 'CNN_VGG2_MML' or model_type == 'CNN_VGG2'
             # Reference: source code for torchvision.models.vggnet
             self.vggnet_features = nn.Sequential(
                 Conv2d(1, 64, kernel_size=3, stride=1, padding=1).to(self.device),
@@ -338,10 +304,11 @@ class beginModeling():
                 Linear(in_features=beginModeling.n_components, out_features=beginModeling.n_class, bias=True).to(self.device)
             )
 
+            # For ResNet, or when model_type == 'CNN_ResNet2_MML' or model_type == 'CNN_ResNet2'
             # Reference: source code for torchvision.models.resnet
             # 2*padding = kernel_size - 1
-            # Ex.1: padding=1, kernel_size=3
-            # Ex.2: padding=0, kernel_size=1
+            # Ex. 1: padding=1, kernel_size=3
+            # Ex. 2: padding=0, kernel_size=1
             self.resnet_filters = [64, 128, 256, 512]
 
             self.resnet_conv = nn.Sequential(
@@ -452,19 +419,19 @@ class beginModeling():
             
 
         def forward(self, xb):
-            if (self.model_type1 == 'PCA' and self.model_type2 == 'LR') or (self.model_type1 == 'PCA' and self.model_type2 == 'SVC'):
+            if (self.model_type1 == 'PCA' and self.model_type2 == 'CEL') or (self.model_type1 == 'PCA' and self.model_type2 == 'MML'):
                 xb = xb.reshape(-1, beginModeling.n_components).to(self.device)
                 xb = self.linear(xb)
                 out = xb.to(self.device) 
 
-            elif self.model_type2 == 'CNN_LR' or self.model_type2 == 'CNN_SVC':
+            elif self.model_type2 == 'CNN_CEL' or self.model_type2 == 'CNN_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device) 
                 xb = self.cnn_num_block(xb)
                 xb = xb.view(xb.size(0), -1).to(self.device)
                 xb = self.linear_num_block(xb)
                 out = xb.to(self.device) 
 
-            elif self.model_type2 == 'PIXEL_LR' or self.model_type2 == 'PIXEL_SVC':
+            elif self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'PIXEL_MML':
                 xb = xb.reshape(-1, 128*128).to(self.device)
                 xb = self.pixel(xb)
                 out = xb.to(self.device) 
@@ -473,8 +440,6 @@ class beginModeling():
                 xb = xb.permute(0, 3, 1, 2) # (batch_size, w, h, c) -> (batch_size, c, w, h)
                 if self.model_type2 == 'CNN_ResNet':
                     model = torchvision.models.resnet18(pretrained=False).to(self.device)
-                    # for param in model.parameters():
-                    #     param.requires_grad = False # Freezing weights.
                     num_infeat = model.fc.in_features
                     model.fc = Linear(num_infeat, beginModeling.n_class).to(self.device)
                 elif self.model_type2 == 'CNN_AlexNet':
@@ -488,7 +453,7 @@ class beginModeling():
                 xb = model(xb)
                 out = xb.to(self.device)
             
-            elif self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_AlexNet2_SVC':
+            elif self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_AlexNet2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.alexnet_features(xb)
                 xb = self.alexnet_avgpool(xb)
@@ -497,7 +462,7 @@ class beginModeling():
                 out = xb.to(self.device)
                 return out
             
-            elif self.model_type2 == 'CNN_VggNet2' or self.model_type2 == 'CNN_VggNet2_SVC':
+            elif self.model_type2 == 'CNN_VggNet2' or self.model_type2 == 'CNN_VggNet2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.vggnet_features(xb)
                 xb = self.vggnet_avgpool(xb)
@@ -506,7 +471,7 @@ class beginModeling():
                 out = xb.to(self.device)
                 return out
 
-            elif self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_ResNet2_SVC':
+            elif self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_ResNet2_MML':
                 xb = torch.unsqueeze(xb, 1).to(self.device)
                 xb = self.resnet_conv(xb)
 
@@ -570,8 +535,6 @@ class beginModeling():
 
             return out
         
-
-        # 2) Fit the model.
         def fit(self, epochs, lr, model, train_loader, val_loader, checkpoint_file, earlystop_file, opt_func=torch.optim.Adam):
 
             train_losses, valid_losses, avg_train_losses, avg_valid_losses = [], [], [], []
@@ -594,14 +557,13 @@ class beginModeling():
                 past_epoch = 0
 
             if (past_epoch+1) < epochs+1:
-                for epoch in range(past_epoch+1, epochs+1): # whew what a relief (that we do not have to start all over again every time we train the model)
-                    # Training Phase
+                for epoch in range(past_epoch+1, epochs+1):
                     for (images, labels) in train_loader:
                         images, labels = images.to(self.device), labels.to(self.device)
                         out = self(images) 
-                        if self.model_type2 == 'LR' or self.model_type2 == 'SVC' or self.model_type2 == 'CNN_LR' or self.model_type2 == 'PIXEL_LR' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
+                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
                             loss = F.cross_entropy(out, labels) 
-                        elif self.model_type2 == 'CNN_SVC' or self.model_type2 == 'PIXEL_SVC' or self.model_type2 == 'CNN_AlexNet2_SVC' or self.model_type2 == 'CNN_ResNet2_SVC' or self.model_type2 == 'CNN_VggNet2_SVC':
+                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VggNet2_MML':
                             loss = F.multi_margin_loss(out, labels) 
                         _, preds = torch.max(out, dim=1) 
                         acc = torch.tensor(torch.sum(preds==labels).item() / len(preds))
@@ -610,15 +572,15 @@ class beginModeling():
                         optimizer.step() # perform a single optimization step (parameter update)
                         optimizer.zero_grad() # clear the gradients of all optimized variables
 
-                        train_losses.append(loss.detach()) # record training loss
+                        train_losses.append(loss.detach()) 
                         train_accs.append(acc.detach())
 
                     for (images, labels) in val_loader:
                         images, labels = images.to(self.device), labels.to(self.device)
                         out = self(images)
-                        if self.model_type2 == 'LR' or self.model_type2 == 'SVC' or self.model_type2 == 'CNN_LR' or self.model_type2 == 'PIXEL_LR' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
+                        if self.model_type2 == 'CEL' or self.model_type2 == 'MML' or self.model_type2 == 'CNN_CEL' or self.model_type2 == 'PIXEL_CEL' or self.model_type2 == 'CNN_ResNet' or self.model_type2 == 'CNN_ResNet2' or self.model_type2 == 'CNN_AlexNet' or self.model_type2 == 'CNN_AlexNet2' or self.model_type2 == 'CNN_VggNet2':
                             loss = F.cross_entropy(out, labels) 
-                        elif self.model_type2 == 'CNN_SVC' or self.model_type2 == 'PIXEL_SVC' or self.model_type2 == 'CNN_AlexNet2_SVC' or self.model_type2 == 'CNN_ResNet2_SVC' or self.model_type2 == 'CNN_VggNet2_SVC':
+                        elif self.model_type2 == 'CNN_MML' or self.model_type2 == 'PIXEL_MML' or self.model_type2 == 'CNN_AlexNet2_MML' or self.model_type2 == 'CNN_ResNet2_MML' or self.model_type2 == 'CNN_VggNet2_MML':
                             loss = F.multi_margin_loss(out, labels) 
                         _, preds = torch.max(out, dim=1) # 
                         acc = torch.tensor(torch.sum(preds==labels).item() / len(preds))
@@ -651,7 +613,7 @@ class beginModeling():
                                 'avg_train_accs' : avg_train_accs,
                                 'avg_valid_accs' : avg_valid_accs}, checkpoint_file)
 
-                    train_losses, valid_losses = [], [] # clear lists to track next epoch
+                    train_losses, valid_losses = [], [] 
 
                     early_stopping(valid_loss, model)
                     if early_stopping.early_stop:
@@ -664,7 +626,6 @@ class beginModeling():
 
             return model, avg_train_losses, avg_valid_losses, avg_train_accs, avg_valid_accs
 
-        # 3) Visualize the log.
         def visualize(self, avg_train_losses, avg_valid_losses, avg_train_accs, avg_valid_accs): 
             # to get values from list containing sub-lists
             def flatten(x):
@@ -702,15 +663,14 @@ class beginModeling():
             plt.tight_layout()
             plt.show()
 
-    # VISUALIZATION (PART 3)
+    # VISUALIZATION (PART 4)
     def ready4Visualization(self, ytest, yfit, yprob, file_path_list, old_uniq_labels):
-        # High Analysis #
         if os.path.isfile(self.high_csv_file): 
             pass
         else:
             df_high = pd.DataFrame()
             for i in range(yfit.shape[0]):
-                idx = old_uniq_labels.index(int(ytest[i])) # (0, 1, ..., beginModeling.n_class-1)
+                idx = old_uniq_labels.index(int(ytest[i])) 
                 actual_prob = yprob[i][idx]
                 pred_prob = np.max(yprob[i], axis=-1)
                 if yfit[i] == ytest[i]:
